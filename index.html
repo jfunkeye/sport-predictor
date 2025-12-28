@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportPredict | Game Outcome Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        football: '#ef4444',
+                        basketball: '#f59e0b',
+                        hockey: '#6366f1',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sport-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .sport-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-active {
+            border-bottom: 3px solid;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm py-4 px-6">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-dark">SportPredict</h1>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="football-tab" class="px-4 py-2 rounded-lg font-medium tab-active border-football text-football">Football</button>
+                    <button id="basketball-tab" class="px-4 py-2 rounded-lg font-medium border-transparent text-gray-500">Basketball</button>
+                    <button id="hockey-tab" class="px-4 py-2 rounded-lg font-medium border-transparent text-gray-500">Ice Hockey</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <!-- Sport Selection & Data Input -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                <!-- Input Section -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                    <div id="football-section" class="sport-section fade-in">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 bg-football rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-futbol text-white"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">Football Match Data</h2>
+                        </div>
+                        <p class="text-gray-600 mb-6">Add previous match results (1-5 matches) to predict future outcomes.</p>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-lg mb-3">Add Previous Matches</h3>
+                            <div id="football-matches" class="space-y-4">
+                                <!-- Match inputs will be added here -->
+                            </div>
+                            <div class="flex justify-between mt-6">
+                                <button id="add-football-match" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">
+                                    <i class="fas fa-plus mr-2"></i>Add Match
+                                </button>
+                                <button id="calculate-football" class="px-6 py-2 bg-football hover:bg-red-600 text-white rounded-lg font-medium">
+                                    Calculate Predictions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="basketball-section" class="sport-section hidden fade-in">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 bg-basketball rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-basketball-ball text-white"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">Basketball Game Data</h2>
+                        </div>
+                        <p class="text-gray-600 mb-6">Add previous game results (1-5 games) to predict future outcomes.</p>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-lg mb-3">Add Previous Games</h3>
+                            <div id="basketball-games" class="space-y-4">
+                                <!-- Game inputs will be added here -->
+                            </div>
+                            <div class="flex justify-between mt-6">
+                                <button id="add-basketball-game" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">
+                                    <i class="fas fa-plus mr-2"></i>Add Game
+                                </button>
+                                <button id="calculate-basketball" class="px-6 py-2 bg-basketball hover:bg-yellow-600 text-white rounded-lg font-medium">
+                                    Calculate Predictions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="hockey-section" class="sport-section hidden fade-in">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 bg-hockey rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-hockey-puck text-white"></i>
+                            </div>
+                            <h2 class="text-xl font-bold">Ice Hockey Game Data</h2>
+                        </div>
+                        <p class="text-gray-600 mb-6">Add previous game results (1-5 games) to predict future outcomes.</p>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-lg mb-3">Add Previous Games</h3>
+                            <div id="hockey-games" class="space-y-4">
+                                <!-- Game inputs will be added here -->
+                            </div>
+                            <div class="flex justify-between mt-6">
+                                <button id="add-hockey-game" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">
+                                    <i class="fas fa-plus mr-2"></i>Add Game
+                                </button>
+                                <button id="calculate-hockey" class="px-6 py-2 bg-hockey hover:bg-indigo-600 text-white rounded-lg font-medium">
+                                    Calculate Predictions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-chart-bar text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold">Predictions</h2>
+                    </div>
+                    
+                    <div id="results-container" class="space-y-6">
+                        <div class="text-center py-10 text-gray-400">
+                            <i class="fas fa-chart-line text-4xl mb-3"></i>
+                            <p>Add match data and click "Calculate Predictions" to see results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-10">
+                <h2 class="text-xl font-bold mb-6">Statistics Overview</h2>
+                <div id="stats-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Stats will be populated here -->
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="bg-gradient-to-r from-primary to-secondary text-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4">How to Use</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="flex items-start">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-3 mr-3">
+                            <i class="fas fa-plus text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-1">1. Add Matches</h3>
+                            <p class="text-sm opacity-90">Add 1 to 5 previous match results for accurate predictions.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-3 mr-3">
+                            <i class="fas fa-calculator text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-1">2. Calculate</h3>
+                            <p class="text-sm opacity-90">Click "Calculate Predictions" to analyze data and generate forecasts.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-3 mr-3">
+                            <i class="fas fa-chart-pie text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-1">3. View Predictions</h3>
+                            <p class="text-sm opacity-90">Check the predictions panel for detailed forecasts and statistics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-white border-t py-6 mt-8">
+            <div class="container mx-auto px-4 text-center text-gray-500">
+                <p>SportPredict &copy; 2025 | Game Outcome Prediction Tool</p>
+                <p class="text-sm mt-2">This tool provides statistical predictions based on historical data for entertainment purposes.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSport = 'football';
+        let footballMatches = [];
+        let basketballGames = [];
+        let hockeyGames = [];
+
+        // DOM Elements
+        const footballTab = document.getElementById('football-tab');
+        const basketballTab = document.getElementById('basketball-tab');
+        const hockeyTab = document.getElementById('hockey-tab');
+        const footballSection = document.getElementById('football-section');
+        const basketballSection = document.getElementById('basketball-section');
+        const hockeySection = document.getElementById('hockey-section');
+        const footballMatchesContainer = document.getElementById('football-matches');
+        const basketballGamesContainer = document.getElementById('basketball-games');
+        const hockeyGamesContainer = document.getElementById('hockey-games');
+        const resultsContainer = document.getElementById('results-container');
+        const statsContainer = document.getElementById('stats-container');
+        
+        // Initialize with one match/game for each sport
+        document.addEventListener('DOMContentLoaded', function() {
+            addFootballMatch();
+            addBasketballGame();
+            addHockeyGame();
+            
+            // Set up tab switching
+            footballTab.addEventListener('click', () => switchSport('football'));
+            basketballTab.addEventListener('click', () => switchSport('basketball'));
+            hockeyTab.addEventListener('click', () => switchSport('hockey'));
+            
+            // Set up calculation buttons
+            document.getElementById('calculate-football').addEventListener('click', calculateFootball);
+            document.getElementById('calculate-basketball').addEventListener('click', calculateBasketball);
+            document.getElementById('calculate-hockey').addEventListener('click', calculateHockey);
+            
+            // Set up add match/game buttons
+            document.getElementById('add-football-match').addEventListener('click', addFootballMatch);
+            document.getElementById('add-basketball-game').addEventListener('click', addBasketballGame);
+            document.getElementById('add-hockey-game').addEventListener('click', addHockeyGame);
+        });
+
+        // Switch between sports
+        function switchSport(sport) {
+            currentSport = sport;
+            
+            // Update tabs
+            [footballTab, basketballTab, hockeyTab].forEach(tab => {
+                tab.classList.remove('tab-active', 'text-football', 'text-basketball', 'text-hockey');
+                tab.classList.add('text-gray-500', 'border-transparent');
+            });
+            
+            // Show active tab
+            if (sport === 'football') {
+                footballTab.classList.add('tab-active', 'text-football', 'border-football');
+                footballTab.classList.remove('text-gray-500', 'border-transparent');
+            } else if (sport === 'basketball') {
+                basketballTab.classList.add('tab-active', 'text-basketball', 'border-basketball');
+                basketballTab.classList.remove('text-gray-500', 'border-transparent');
+            } else if (sport === 'hockey') {
+                hockeyTab.classList.add('tab-active', 'text-hockey', 'border-hockey');
+                hockeyTab.classList.remove('text-gray-500', 'border-transparent');
+            }
+            
+            // Show corresponding section
+            footballSection.classList.add('hidden');
+            basketballSection.classList.add('hidden');
+            hockeySection.classList.add('hidden');
+            
+            if (sport === 'football') {
+                footballSection.classList.remove('hidden');
+            } else if (sport === 'basketball') {
+                basketballSection.classList.remove('hidden');
+            } else if (sport === 'hockey') {
+                hockeySection.classList.remove('hidden');
+            }
+            
+            // Clear results
+            resultsContainer.innerHTML = `
+                <div class="text-center py-10 text-gray-400">
+                    <i class="fas fa-chart-line text-4xl mb-3"></i>
+                    <p>Add match data and click "Calculate Predictions" to see results</p>
+                </div>
+            `;
+            
+            // Clear stats
+            statsContainer.innerHTML = '';
+        }
+
+        // Football functions
+        function addFootballMatch() {
+            if (footballMatches.length >= 5) {
+                alert('Maximum 5 matches allowed');
+                return;
+            }
+            
+            const matchId = footballMatches.length + 1;
+            const matchHTML = `
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" id="football-match-${matchId}">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">Match ${matchId}</h4>
+                        ${matchId > 1 ? `<button class="text-red-500 hover:text-red-700" onclick="removeFootballMatch(${matchId})">
+                            <i class="fas fa-times"></i>
+                        </button>` : ''}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 1 Name</label>
+                            <input type="text" class="football-team1-name w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. Manchester United" value="Team A">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 2 Name</label>
+                            <input type="text" class="football-team2-name w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. Liverpool" value="Team B">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 1 Goals</label>
+                            <input type="number" min="0" class="football-team1-goals w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Goals" value="${Math.floor(Math.random() * 5)}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 2 Goals</label>
+                            <input type="number" min="0" class="football-team2-goals w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Goals" value="${Math.floor(Math.random() * 5)}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            footballMatchesContainer.insertAdjacentHTML('beforeend', matchHTML);
+            footballMatches.push({id: matchId});
+        }
+
+        function removeFootballMatch(id) {
+            const matchElement = document.getElementById(`football-match-${id}`);
+            if (matchElement) {
+                matchElement.remove();
+                
+                // Update the array
+                footballMatches = footballMatches.filter(match => match.id !== id);
+                
+                // Renumber remaining matches
+                const remainingMatches = footballMatchesContainer.querySelectorAll('[id^="football-match-"]');
+                remainingMatches.forEach((matchElement, index) => {
+                    const newId = index + 1;
+                    matchElement.id = `football-match-${newId}`;
+                    matchElement.querySelector('h4').textContent = `Match ${newId}`;
+                    
+                    // Update the button if not the first match
+                    const removeBtn = matchElement.querySelector('button');
+                    if (newId > 1 && removeBtn) {
+                        removeBtn.setAttribute('onclick', `removeFootballMatch(${newId})`);
+                    } else if (newId === 1 && removeBtn) {
+                        removeBtn.remove();
+                    }
+                });
+                
+                // Update the array IDs
+                footballMatches = footballMatches.map((match, index) => ({id: index + 1}));
+            }
+        }
+
+        function calculateFootball() {
+            // Collect match data
+            const matches = [];
+            const matchElements = footballMatchesContainer.querySelectorAll('[id^="football-match-"]');
+            
+            if (matchElements.length === 0) {
+                alert('Please add at least one match');
+                return;
+            }
+            
+            matchElements.forEach(matchElement => {
+                const team1Name = matchElement.querySelector('.football-team1-name').value || 'Team 1';
+                const team2Name = matchElement.querySelector('.football-team2-name').value || 'Team 2';
+                const team1Goals = parseInt(matchElement.querySelector('.football-team1-goals').value) || 0;
+                const team2Goals = parseInt(matchElement.querySelector('.football-team2-goals').value) || 0;
+                
+                matches.push({
+                    team1: team1Name,
+                    team2: team2Name,
+                    team1Goals: team1Goals,
+                    team2Goals: team2Goals,
+                    totalGoals: team1Goals + team2Goals
+                });
+            });
+            
+            // Calculate statistics
+            const team1Goals = matches.map(match => match.team1Goals);
+            const team2Goals = matches.map(match => match.team2Goals);
+            const totalGoals = matches.map(match => match.totalGoals);
+            
+            const avgTeam1Goals = team1Goals.reduce((a, b) => a + b, 0) / team1Goals.length;
+            const avgTeam2Goals = team2Goals.reduce((a, b) => a + b, 0) / team2Goals.length;
+            const avgTotalGoals = totalGoals.reduce((a, b) => a + b, 0) / totalGoals.length;
+            
+            const maxTeam1Goals = Math.max(...team1Goals);
+            const minTeam1Goals = Math.min(...team1Goals);
+            const maxTeam2Goals = Math.max(...team2Goals);
+            const minTeam2Goals = Math.min(...team2Goals);
+            const maxTotalGoals = Math.max(...totalGoals);
+            const minTotalGoals = Math.min(...totalGoals);
+            
+            // Project next match
+            const projectedTeam1Goals = Math.round(avgTeam1Goals);
+            const projectedTeam2Goals = Math.round(avgTeam2Goals);
+            const projectedTotalGoals = Math.round(avgTotalGoals);
+            
+            // Display results
+            displayFootballResults(matches, {
+                avgTeam1Goals, avgTeam2Goals, avgTotalGoals,
+                maxTeam1Goals, minTeam1Goals,
+                maxTeam2Goals, minTeam2Goals,
+                maxTotalGoals, minTotalGoals,
+                projectedTeam1Goals, projectedTeam2Goals, projectedTotalGoals
+            });
+            
+            // Display statistics
+            displayFootballStats(matches, {
+                avgTeam1Goals, avgTeam2Goals, avgTotalGoals,
+                maxTeam1Goals, minTeam1Goals,
+                maxTeam2Goals, minTeam2Goals,
+                maxTotalGoals, minTotalGoals
+            });
+        }
+
+        function displayFootballResults(matches, stats) {
+            const team1Name = matches[0].team1;
+            const team2Name = matches[0].team2;
+            
+            resultsContainer.innerHTML = `
+                <div class="fade-in">
+                    <h3 class="font-bold text-lg mb-4 text-football">Football Predictions</h3>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-2">Next Match Projection</h4>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-center">
+                                    <div class="font-bold">${team1Name}</div>
+                                    <div class="text-2xl font-bold text-football">${stats.projectedTeam1Goals}</div>
+                                </div>
+                                <div class="text-xl font-bold">VS</div>
+                                <div class="text-center">
+                                    <div class="font-bold">${team2Name}</div>
+                                    <div class="text-2xl font-bold text-football">${stats.projectedTeam2Goals}</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500">Projected total goals: ${stats.projectedTotalGoals}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">${team1Name} Prediction</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Using average:</span>
+                                    <span class="font-bold">${stats.avgTeam1Goals.toFixed(1)}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using highest:</span>
+                                    <span class="font-bold">${stats.maxTeam1Goals}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using lowest:</span>
+                                    <span class="font-bold">${stats.minTeam1Goals}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2">${team2Name} Prediction</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Using average:</span>
+                                    <span class="font-bold">${stats.avgTeam2Goals.toFixed(1)}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using highest:</span>
+                                    <span class="font-bold">${stats.maxTeam2Goals}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using lowest:</span>
+                                    <span class="font-bold">${stats.minTeam2Goals}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t">
+                        <h4 class="font-semibold mb-2">Total Goals Prediction</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Using average:</span>
+                                <span class="font-bold">${stats.avgTotalGoals.toFixed(1)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using highest:</span>
+                                <span class="font-bold">${stats.maxTotalGoals}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using lowest:</span>
+                                <span class="font-bold">${stats.minTotalGoals}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayFootballStats(matches, stats) {
+            statsContainer.innerHTML = `
+                <div class="bg-football bg-opacity-10 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-football rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-futbol text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Average Goals</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.avgTotalGoals.toFixed(1)}</p>
+                    <p class="text-sm text-gray-600">Per match</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-arrow-up text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Highest Goals</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.maxTotalGoals}</p>
+                    <p class="text-sm text-gray-600">In a single match</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-arrow-down text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Lowest Goals</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.minTotalGoals}</p>
+                    <p class="text-sm text-gray-600">In a single match</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Matches Analyzed</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${matches.length}</p>
+                    <p class="text-sm text-gray-600">Total matches</p>
+                </div>
+            `;
+        }
+
+        // Basketball functions (similar pattern as football)
+        function addBasketballGame() {
+            if (basketballGames.length >= 5) {
+                alert('Maximum 5 games allowed');
+                return;
+            }
+            
+            const gameId = basketballGames.length + 1;
+            const gameHTML = `
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" id="basketball-game-${gameId}">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">Game ${gameId}</h4>
+                        ${gameId > 1 ? `<button class="text-red-500 hover:text-red-700" onclick="removeBasketballGame(${gameId})">
+                            <i class="fas fa-times"></i>
+                        </button>` : ''}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 1 Name</label>
+                            <input type="text" class="basketball-team1-name w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. Lakers" value="Team A">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 2 Name</label>
+                            <input type="text" class="basketball-team2-name w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. Celtics" value="Team B">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 1 Points</label>
+                            <input type="number" min="0" class="basketball-team1-points w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Points" value="${Math.floor(Math.random() * 50) + 70}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 2 Points</label>
+                            <input type="number" min="0" class="basketball-team2-points w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Points" value="${Math.floor(Math.random() * 50) + 70}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            basketballGamesContainer.insertAdjacentHTML('beforeend', gameHTML);
+            basketballGames.push({id: gameId});
+        }
+
+        function removeBasketballGame(id) {
+            const gameElement = document.getElementById(`basketball-game-${id}`);
+            if (gameElement) {
+                gameElement.remove();
+                
+                // Update the array
+                basketballGames = basketballGames.filter(game => game.id !== id);
+                
+                // Renumber remaining games
+                const remainingGames = basketballGamesContainer.querySelectorAll('[id^="basketball-game-"]');
+                remainingGames.forEach((gameElement, index) => {
+                    const newId = index + 1;
+                    gameElement.id = `basketball-game-${newId}`;
+                    gameElement.querySelector('h4').textContent = `Game ${newId}`;
+                    
+                    // Update the button if not the first game
+                    const removeBtn = gameElement.querySelector('button');
+                    if (newId > 1 && removeBtn) {
+                        removeBtn.setAttribute('onclick', `removeBasketballGame(${newId})`);
+                    } else if (newId === 1 && removeBtn) {
+                        removeBtn.remove();
+                    }
+                });
+                
+                // Update the array IDs
+                basketballGames = basketballGames.map((game, index) => ({id: index + 1}));
+            }
+        }
+
+        function calculateBasketball() {
+            // Collect game data
+            const games = [];
+            const gameElements = basketballGamesContainer.querySelectorAll('[id^="basketball-game-"]');
+            
+            if (gameElements.length === 0) {
+                alert('Please add at least one game');
+                return;
+            }
+            
+            gameElements.forEach(gameElement => {
+                const team1Name = gameElement.querySelector('.basketball-team1-name').value || 'Team 1';
+                const team2Name = gameElement.querySelector('.basketball-team2-name').value || 'Team 2';
+                const team1Points = parseInt(gameElement.querySelector('.basketball-team1-points').value) || 0;
+                const team2Points = parseInt(gameElement.querySelector('.basketball-team2-points').value) || 0;
+                
+                games.push({
+                    team1: team1Name,
+                    team2: team2Name,
+                    team1Points: team1Points,
+                    team2Points: team2Points,
+                    totalPoints: team1Points + team2Points,
+                    // For basketball, calculate halftime points (assuming each half is equal for simplicity)
+                    team1Halftime: Math.round(team1Points / 2),
+                    team2Halftime: Math.round(team2Points / 2),
+                    totalHalftime: Math.round((team1Points + team2Points) / 2)
+                });
+            });
+            
+            // Calculate statistics
+            const team1Points = games.map(game => game.team1Points);
+            const team2Points = games.map(game => game.team2Points);
+            const totalPoints = games.map(game => game.totalPoints);
+            const halftimePoints = games.map(game => game.totalHalftime);
+            
+            const avgTeam1Points = team1Points.reduce((a, b) => a + b, 0) / team1Points.length;
+            const avgTeam2Points = team2Points.reduce((a, b) => a + b, 0) / team2Points.length;
+            const avgTotalPoints = totalPoints.reduce((a, b) => a + b, 0) / totalPoints.length;
+            const avgHalftimePoints = halftimePoints.reduce((a, b) => a + b, 0) / halftimePoints.length;
+            
+            const maxTeam1Points = Math.max(...team1Points);
+            const minTeam1Points = Math.min(...team1Points);
+            const maxTeam2Points = Math.max(...team2Points);
+            const minTeam2Points = Math.min(...team2Points);
+            const maxTotalPoints = Math.max(...totalPoints);
+            const minTotalPoints = Math.min(...totalPoints);
+            const maxHalftimePoints = Math.max(...halftimePoints);
+            const minHalftimePoints = Math.min(...halftimePoints);
+            
+            // Project next game
+            const projectedTeam1Points = Math.round(avgTeam1Points);
+            const projectedTeam2Points = Math.round(avgTeam2Points);
+            const projectedTotalPoints = Math.round(avgTotalPoints);
+            const projectedHalftimePoints = Math.round(avgHalftimePoints);
+            
+            // Display results
+            displayBasketballResults(games, {
+                avgTeam1Points, avgTeam2Points, avgTotalPoints, avgHalftimePoints,
+                maxTeam1Points, minTeam1Points,
+                maxTeam2Points, minTeam2Points,
+                maxTotalPoints, minTotalPoints,
+                maxHalftimePoints, minHalftimePoints,
+                projectedTeam1Points, projectedTeam2Points, 
+                projectedTotalPoints, projectedHalftimePoints
+            });
+        }
+
+        function displayBasketballResults(games, stats) {
+            const team1Name = games[0].team1;
+            const team2Name = games[0].team2;
+            
+            resultsContainer.innerHTML = `
+                <div class="fade-in">
+                    <h3 class="font-bold text-lg mb-4 text-basketball">Basketball Predictions</h3>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-2">Next Game Projection</h4>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-center">
+                                    <div class="font-bold">${team1Name}</div>
+                                    <div class="text-2xl font-bold text-basketball">${stats.projectedTeam1Points}</div>
+                                </div>
+                                <div class="text-xl font-bold">VS</div>
+                                <div class="text-center">
+                                    <div class="font-bold">${team2Name}</div>
+                                    <div class="text-2xl font-bold text-basketball">${stats.projectedTeam2Points}</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500">Projected total points: ${stats.projectedTotalPoints}</div>
+                            <div class="text-sm text-gray-500 mt-1">Projected halftime points: ${stats.projectedHalftimePoints}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">${team1Name} Prediction</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Using average:</span>
+                                    <span class="font-bold">${stats.avgTeam1Points.toFixed(1)}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using highest:</span>
+                                    <span class="font-bold">${stats.maxTeam1Points}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using lowest:</span>
+                                    <span class="font-bold">${stats.minTeam1Points}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2">${team2Name} Prediction</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Using average:</span>
+                                    <span class="font-bold">${stats.avgTeam2Points.toFixed(1)}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using highest:</span>
+                                    <span class="font-bold">${stats.maxTeam2Points}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using lowest:</span>
+                                    <span class="font-bold">${stats.minTeam2Points}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4 pb-4 border-b">
+                        <h4 class="font-semibold mb-2">Total Points Prediction</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Using average:</span>
+                                <span class="font-bold">${stats.avgTotalPoints.toFixed(1)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using highest:</span>
+                                <span class="font-bold">${stats.maxTotalPoints}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using lowest:</span>
+                                <span class="font-bold">${stats.minTotalPoints}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-2">Halftime Points Prediction</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Using average:</span>
+                                <span class="font-bold">${stats.avgHalftimePoints.toFixed(1)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using highest:</span>
+                                <span class="font-bold">${stats.maxHalftimePoints}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using lowest:</span>
+                                <span class="font-bold">${stats.minHalftimePoints}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Update stats
+            statsContainer.innerHTML = `
+                <div class="bg-basketball bg-opacity-10 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-basketball rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-basketball-ball text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Average Points</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.avgTotalPoints.toFixed(1)}</p>
+                    <p class="text-sm text-gray-600">Per game</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-arrow-up text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Highest Points</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.maxTotalPoints}</p>
+                    <p class="text-sm text-gray-600">In a single game</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-arrow-down text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Lowest Points</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.minTotalPoints}</p>
+                    <p class="text-sm text-gray-600">In a single game</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Games Analyzed</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${games.length}</p>
+                    <p class="text-sm text-gray-600">Total games</p>
+                </div>
+            `;
+        }
+
+        // Hockey functions (similar pattern as basketball but without halftime)
+        function addHockeyGame() {
+            if (hockeyGames.length >= 5) {
+                alert('Maximum 5 games allowed');
+                return;
+            }
+            
+            const gameId = hockeyGames.length + 1;
+            const gameHTML = `
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" id="hockey-game-${gameId}">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-medium">Game ${gameId}</h4>
+                        ${gameId > 1 ? `<button class="text-red-500 hover:text-red-700" onclick="removeHockeyGame(${gameId})">
+                            <i class="fas fa-times"></i>
+                        </button>` : ''}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 1 Name</label>
+                            <input type="text" class="hockey-team1-name w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. Bruins" value="Team A">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 2 Name</label>
+                            <input type="text" class="hockey-team2-name w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="e.g. Canadiens" value="Team B">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 1 Points</label>
+                            <input type="number" min="0" class="hockey-team1-points w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Points" value="${Math.floor(Math.random() * 6)}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Team 2 Points</label>
+                            <input type="number" min="0" class="hockey-team2-points w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Points" value="${Math.floor(Math.random() * 6)}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            hockeyGamesContainer.insertAdjacentHTML('beforeend', gameHTML);
+            hockeyGames.push({id: gameId});
+        }
+
+        function removeHockeyGame(id) {
+            const gameElement = document.getElementById(`hockey-game-${id}`);
+            if (gameElement) {
+                gameElement.remove();
+                
+                // Update the array
+                hockeyGames = hockeyGames.filter(game => game.id !== id);
+                
+                // Renumber remaining games
+                const remainingGames = hockeyGamesContainer.querySelectorAll('[id^="hockey-game-"]');
+                remainingGames.forEach((gameElement, index) => {
+                    const newId = index + 1;
+                    gameElement.id = `hockey-game-${newId}`;
+                    gameElement.querySelector('h4').textContent = `Game ${newId}`;
+                    
+                    // Update the button if not the first game
+                    const removeBtn = gameElement.querySelector('button');
+                    if (newId > 1 && removeBtn) {
+                        removeBtn.setAttribute('onclick', `removeHockeyGame(${newId})`);
+                    } else if (newId === 1 && removeBtn) {
+                        removeBtn.remove();
+                    }
+                });
+                
+                // Update the array IDs
+                hockeyGames = hockeyGames.map((game, index) => ({id: index + 1}));
+            }
+        }
+
+        function calculateHockey() {
+            // Collect game data
+            const games = [];
+            const gameElements = hockeyGamesContainer.querySelectorAll('[id^="hockey-game-"]');
+            
+            if (gameElements.length === 0) {
+                alert('Please add at least one game');
+                return;
+            }
+            
+            gameElements.forEach(gameElement => {
+                const team1Name = gameElement.querySelector('.hockey-team1-name').value || 'Team 1';
+                const team2Name = gameElement.querySelector('.hockey-team2-name').value || 'Team 2';
+                const team1Points = parseInt(gameElement.querySelector('.hockey-team1-points').value) || 0;
+                const team2Points = parseInt(gameElement.querySelector('.hockey-team2-points').value) || 0;
+                
+                games.push({
+                    team1: team1Name,
+                    team2: team2Name,
+                    team1Points: team1Points,
+                    team2Points: team2Points,
+                    totalPoints: team1Points + team2Points
+                });
+            });
+            
+            // Calculate statistics
+            const team1Points = games.map(game => game.team1Points);
+            const team2Points = games.map(game => game.team2Points);
+            const totalPoints = games.map(game => game.totalPoints);
+            
+            const avgTeam1Points = team1Points.reduce((a, b) => a + b, 0) / team1Points.length;
+            const avgTeam2Points = team2Points.reduce((a, b) => a + b, 0) / team2Points.length;
+            const avgTotalPoints = totalPoints.reduce((a, b) => a + b, 0) / totalPoints.length;
+            
+            const maxTeam1Points = Math.max(...team1Points);
+            const minTeam1Points = Math.min(...team1Points);
+            const maxTeam2Points = Math.max(...team2Points);
+            const minTeam2Points = Math.min(...team2Points);
+            const maxTotalPoints = Math.max(...totalPoints);
+            const minTotalPoints = Math.min(...totalPoints);
+            
+            // Project next game
+            const projectedTeam1Points = Math.round(avgTeam1Points);
+            const projectedTeam2Points = Math.round(avgTeam2Points);
+            const projectedTotalPoints = Math.round(avgTotalPoints);
+            
+            // Display results
+            displayHockeyResults(games, {
+                avgTeam1Points, avgTeam2Points, avgTotalPoints,
+                maxTeam1Points, minTeam1Points,
+                maxTeam2Points, minTeam2Points,
+                maxTotalPoints, minTotalPoints,
+                projectedTeam1Points, projectedTeam2Points, projectedTotalPoints
+            });
+        }
+
+        function displayHockeyResults(games, stats) {
+            const team1Name = games[0].team1;
+            const team2Name = games[0].team2;
+            
+            resultsContainer.innerHTML = `
+                <div class="fade-in">
+                    <h3 class="font-bold text-lg mb-4 text-hockey">Ice Hockey Predictions</h3>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-2">Next Game Projection</h4>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-center">
+                                    <div class="font-bold">${team1Name}</div>
+                                    <div class="text-2xl font-bold text-hockey">${stats.projectedTeam1Points}</div>
+                                </div>
+                                <div class="text-xl font-bold">VS</div>
+                                <div class="text-center">
+                                    <div class="font-bold">${team2Name}</div>
+                                    <div class="text-2xl font-bold text-hockey">${stats.projectedTeam2Points}</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500">Projected total points: ${stats.projectedTotalPoints}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">${team1Name} Prediction</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Using average:</span>
+                                    <span class="font-bold">${stats.avgTeam1Points.toFixed(1)}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using highest:</span>
+                                    <span class="font-bold">${stats.maxTeam1Points}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using lowest:</span>
+                                    <span class="font-bold">${stats.minTeam1Points}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold mb-2">${team2Name} Prediction</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>Using average:</span>
+                                    <span class="font-bold">${stats.avgTeam2Points.toFixed(1)}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using highest:</span>
+                                    <span class="font-bold">${stats.maxTeam2Points}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Using lowest:</span>
+                                    <span class="font-bold">${stats.minTeam2Points}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-2">Total Points Prediction</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Using average:</span>
+                                <span class="font-bold">${stats.avgTotalPoints.toFixed(1)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using highest:</span>
+                                <span class="font-bold">${stats.maxTotalPoints}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Using lowest:</span>
+                                <span class="font-bold">${stats.minTotalPoints}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Update stats
+            statsContainer.innerHTML = `
+                <div class="bg-hockey bg-opacity-10 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-hockey rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-hockey-puck text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Average Points</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.avgTotalPoints.toFixed(1)}</p>
+                    <p class="text-sm text-gray-600">Per game</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-arrow-up text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Highest Points</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.maxTotalPoints}</p>
+                    <p class="text-sm text-gray-600">In a single game</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-arrow-down text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Lowest Points</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${stats.minTotalPoints}</p>
+                    <p class="text-sm text-gray-600">In a single game</p>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-gray-600 rounded-md flex items-center justify-center mr-2">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-bold">Games Analyzed</h4>
+                    </div>
+                    <p class="text-2xl font-bold">${games.length}</p>
+                    <p class="text-sm text-gray-600">Total games</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
